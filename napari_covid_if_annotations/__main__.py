@@ -1,7 +1,8 @@
 import argparse
 
-from .launcher import launch_covid_if_annotation_tool
+from napari_covid_if_annotations.launcher import launch_covid_if_annotation_tool
 
+import vispy.app.backends._pyqt5
 
 def main():
     parser = argparse.ArgumentParser()

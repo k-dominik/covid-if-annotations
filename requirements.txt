@@ -1,5 +1,7 @@
 h5py
 magicgui
+napari_plugin_engine>=0.1.4
 napari
 numpy
-pyqt>=5.12.3
+pandas
+scikit-image
