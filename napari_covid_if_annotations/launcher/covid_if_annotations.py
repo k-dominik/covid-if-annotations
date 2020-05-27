@@ -36,15 +36,3 @@ def launch_covid_if_annotation_tool(path=None, saturation_factor=1, edge_width=2
         # set the on click label toggle mode
         set_toggle_mode(viewer)
 
-        # FIXME pushing one of the buttons calls
-        # TypeError: toggle_hide_annotated_segments_gui() missing 1 required positional argument: 'viewer'
-
-        # connect the gui elements
-        # 1.) the update layers button
-        update_gui = update_layers_gui.Gui()
-        viewer.window.add_dock_widget(update_gui)
-
-        # 2.) the hide annotated segments button
-        hide_gui = toggle_hide_annotated_segments_gui.Gui()
-        viewer.window.add_dock_widget(hide_gui)
-
