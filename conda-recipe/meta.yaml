@@ -2,7 +2,7 @@
 
 package:
   name: covid-if-annotations
-  version: 0.0.2dev1
+  version: 0.0.2dev5
 
 source:
   path: ..
