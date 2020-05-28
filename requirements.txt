@@ -3,4 +3,3 @@ magicgui
 napari
 numpy
 pyside2
-pyqt>=5.12.3
