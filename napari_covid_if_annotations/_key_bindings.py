@@ -3,9 +3,45 @@ import os
 import numpy as np
 from napari import Viewer
 from napari.layers.points import Points
+from napari.layers.labels import Labels
 
 from .image_utils import get_edge_segmentation, get_centroids, map_labels_to_edges
 from .layers import get_centroid_properties, save_labels
+
+
+def replace_layer(new_layer, layers, name_to_replace):
+    for layer in layers:
+        if layer.name == name_to_replace:
+            layer.data = new_layer.data
+            layer.metadata = new_layer.metadata
+    layers.remove(new_layer.name)
+
+
+# the event object will have the following useful things:
+# event.source -> the full viewer.layers object itself
+# event.item -> the specific layer that cause the change
+# event.type -> a string like 'added', 'removed'
+def on_layer_change(event):
+    try:
+        # if we add new labels or new points, we need to replace instead
+        # of adding them
+        if isinstance(event.item, Labels) and event.type == 'added':
+            layers = event.source
+            layer = event.item
+            if len([ll for ll in layers if isinstance(ll, Labels)]) > 1:
+                replace_layer(layer, layers, 'cell-segmentation')
+
+        if isinstance(event.item, Points) and event.type == 'added':
+            layers = event.source
+            layer = event.item
+            if len([ll for ll in layers if isinstance(ll, Points)]) > 1:
+                replace_layer(event.item, layers, 'infected-vs-control')
+
+        # add the 'change label on click' functionality to the points layer
+        if isinstance(event.item, Points) and event.type == 'added':
+            event.item.mouse_drag_callbacks.append(next_on_click)
+    except AttributeError:
+        pass
 
 
 def update_infected_labels_from_segmentation(seg_ids, prev_seg_ids, infected_labels):
@@ -30,26 +66,12 @@ def update_infected_labels_from_points(point_labels, infected_labels):
     return np.array([0] + point_labels.tolist())
 
 
-def modify_layers(viewer):
+# TODO we should also disable removing all the layers!
+def modify_points_layer(viewer):
     control_widgets = viewer.window.qt_viewer.controls.widgets
-
     # disable the add point button in the infected-vs-control layer
     points_controls = control_widgets[viewer.layers['infected-vs-control']]
     points_controls.addition_button.setEnabled(False)
-
-
-def set_toggle_mode(viewer):
-    """Keybinding to set the viewer selection mode and mouse callbacks
-    for toggling selected points properties by clicking on them
-    """
-    layer = viewer.layers['infected-vs-control']
-    if next_on_click not in layer.mouse_drag_callbacks:
-        layer.mouse_drag_callbacks.append(next_on_click)
-
-
-def modify_viewer(viewer):
-    modify_layers(viewer)
-    set_toggle_mode(viewer)
 
 
 #
@@ -58,8 +80,9 @@ def modify_viewer(viewer):
 
 @Viewer.bind_key('n')
 def paint_new_label(viewer):
-    # FIXME this is hacky, we need to make this clean
-    modify_viewer(viewer)
+    # FIXME this should be calloed on initialization, but don't know how to do it via the events
+    modify_points_layer(viewer)
+
     layer = viewer.layers['cell-segmentation']
     viewer.layers.unselect_all()
     layer.selected = True
@@ -71,9 +94,9 @@ def paint_new_label(viewer):
 
 @Viewer.bind_key('Shift-S')
 def _save_labels(viewer, is_partial=False):
-    # FIXME this is hacky, we need to make this clean
-    modify_viewer(viewer)
-    print(viewer)
+    # FIXME this should be calloed on initialization, but don't know how to do it via the events
+    modify_points_layer(viewer)
+
     to_save = [
         (viewer.layers['cell-segmentation'], {}, 'labels')
     ]
@@ -82,8 +105,8 @@ def _save_labels(viewer, is_partial=False):
 
 @Viewer.bind_key('u')
 def update_layers(viewer):
-    # FIXME this is hacky, we need to make this clean
-    modify_viewer(viewer)
+    # FIXME this should be calloed on initialization, but don't know how to do it via the events
+    modify_points_layer(viewer)
 
     # get the segmentation as well as the previous seg ids and infected labels
     # from the segmentation layer
@@ -129,8 +152,8 @@ def update_layers(viewer):
 
 @Viewer.bind_key('h')
 def toggle_hide_annotated_segments(viewer):
-    # FIXME this is hacky, we need to make this clean
-    modify_viewer(viewer)
+    # FIXME this should be calloed on initialization, but don't know how for io hook
+    modify_points_layer(viewer)
 
     seg_layer = viewer.layers['cell-segmentation']
     metadata = seg_layer.metadata

@@ -3,7 +3,7 @@ import napari
 
 from napari_covid_if_annotations.layers import get_layers_from_file
 from napari_covid_if_annotations.gui import connect_to_viewer
-from napari_covid_if_annotations._key_bindings import modify_viewer
+from napari_covid_if_annotations._key_bindings import on_layer_change
 
 
 def initialize_from_file(viewer, path, saturation_factor, edge_width):
@@ -25,6 +25,7 @@ def launch_covid_if_annotation_tool(path=None, saturation_factor=1, edge_width=2
     with_data = path is not None
     with napari.gui_qt():
         viewer = napari.Viewer()
+        viewer.layers.events.changed.connect(on_layer_change)
 
         if with_data:
             initialize_from_file(viewer, path,
@@ -32,10 +33,6 @@ def launch_covid_if_annotation_tool(path=None, saturation_factor=1, edge_width=2
 
         # connect the gui elements and modify layer functionality
         connect_to_viewer(viewer)
-
-        # set the on click label toggle mode
-        if with_data:
-            modify_viewer(viewer)
 
 
 if __name__ == '__main__':
