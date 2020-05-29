@@ -1,4 +1,4 @@
-# napari-covid-if-annotations
+# covid-if-annotation-tool
 
 Annotation Tool for immunofluorescence assay images
 
@@ -10,6 +10,7 @@ Annotation Tool for immunofluorescence assay images
 
 It allows you to manually annotate 2D images of cells, starting from an exisitng and partially wrong cell segmentation. Two kinds of annotations are supported: 1) correcting the provided segmentation and 2) assigning one of the predefined labels to segmented cells. **We would greatly appreciate labels of both kinds!**
 
+You can find a [short video demonstrating the tools functionality here.](https://www.youtube.com/watch?v=IwpRrX_PDFo&feature=youtu.be).
 
 ## Step-by-step guide
 
@@ -17,7 +18,7 @@ It allows you to manually annotate 2D images of cells, starting from an exisitng
 
 You can download the software here:
 - [Windows](https://files.ilastik.org/covid-if-annotations-setup-latest.exe).
-- Mac: coming soon.
+- [Mac](https://files.ilastik.org/covid-if-annotations_0.0.2dev5.app.tar.bz2)
 
 TODO add installation instructions
 
@@ -68,7 +69,10 @@ Now the pipette is for the color picker, the drop for filling and the pen for dr
 Keep going until you have all the cells labeled and all segmentation errors fixed.
 **Don't forget to save your results frequently by pressing "shfit + s"!**
 The results will be saved to a file called `"IMAGE_NAME_annotations.h5" in the same folder where you store the image.`
-If you get really tired or bored and can't do the whole image, send us the partial result, that would already be very helpful! You can also take breaks and [load the saved annotations](https://github.com/hci-unihd/covid-if-annotations#reload-saved-results) again to continue later.
+
+In order to see your progress and find the cells you still need to label, you can press "h" to hide the boundaries in "cell-outlines" for the cells which you have annotated already.
+
+If you get really tired or bored and can't do the whole image, send us the partial result, that would already be very helpful! You can also take a break and [load the saved annotations](https://github.com/hci-unihd/covid-if-annotations#reload-saved-results) again to continue later.
 
 ### Reload saved results
 
@@ -100,9 +104,8 @@ Set up a conda environment with all dependencies and activate it:
 conda create -c conda-forge -n test-annotations napari scikit-image h5py pandas
 conda activate test-annotations
 ```
-Then install magicgui and this tool using pip:
+Then install this tool using pip:
 ```
-pip install magicgui
 pip install -e .
 ```
 
@@ -121,8 +124,7 @@ Example data is [available here](https://oc.embl.de/index.php/s/IghxebboVxgpraU)
 ## Keybindings:
 - `u` update point and edge layer from the segmentation corrections and semantic annotations.
 - `h` toggle visibility of already annotated segments.
-- `.` cycle through the annotations for a selected point
-- `t` toggle annotation cycling by mouse click (not working yet!)
+- `n` get next label
 - `Shift + s` save the current annotations (segmentation + infected-vs-control labels)
 
 
