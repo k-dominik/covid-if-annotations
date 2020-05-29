@@ -9,11 +9,18 @@ from .image_utils import get_edge_segmentation, get_centroids, map_labels_to_edg
 from .layers import get_centroid_properties, save_labels
 
 
-def replace_layer(new_layer, layers, name_to_replace):
+def replace_layer(new_layer, layers, name_to_replace, protected_metadata=None):
     for layer in layers:
         if layer.name == name_to_replace:
+            if protected_metadata is None:
+                new_metadata = new_layer.metadata
+            else:
+                new_metadata = layer.metadata
+                new_metadata.update({k: v for k, v in new_layer.metadata.items()
+                                     if k not in protected_metadata})
             layer.data = new_layer.data
-            layer.metadata = new_layer.metadata
+            layer.metadata = new_metadata
+
     layers.remove(new_layer.name)
 
 
@@ -29,7 +36,7 @@ def on_layer_change(event):
             layers = event.source
             layer = event.item
             if len([ll for ll in layers if isinstance(ll, Labels)]) > 1:
-                replace_layer(layer, layers, 'cell-segmentation')
+                replace_layer(layer, layers, 'cell-segmentation', protected_metadata=['filename'])
 
         if isinstance(event.item, Points) and event.type == 'added':
             layers = event.source
@@ -97,6 +104,9 @@ def paint_new_label(viewer):
 def _save_labels(viewer, is_partial=False):
     # FIXME this should be calloed on initialization, but don't know how to do it via the events
     modify_points_layer(viewer)
+
+    # we need to update before saving, otherwise segmentation
+    update_layers(viewer)
 
     to_save = [
         (viewer.layers['cell-segmentation'], {}, 'labels')
