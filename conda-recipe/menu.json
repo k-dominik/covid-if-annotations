@@ -4,7 +4,7 @@
         [
             {
                 "name": "covif-if",
-                "icon": "${MENU_DIR}/covid-if2.ico",
+                "icon": "${MENU_DIR}/icon_256x256.ico",
                 "script": "${PYTHON_SCRIPTS}/covid-if.exe",
                 "desktop": false,
                 "quicklaunch": false
