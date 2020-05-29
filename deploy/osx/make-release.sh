@@ -1,6 +1,8 @@
 set -e
 set -x
 
+# run from covid-if-annotations folder
+
 eval "$(conda shell.bash hook)"
 conda activate base
 CONDA_ROOT=`conda info --root`
@@ -50,9 +52,9 @@ cd __main__.app/Contents/MacOS && ln -s ../covid-release/bin/python
 cd -
 
 # Fix app icon link
-# rm ilastik.app/Contents/Resources/appIcon.icns
-# cd ilastik.app/Contents/Resources && ln -s ../ilastik-release/ilastik/appIcon.icns
-# cd -
+rm __main__.app/Contents/Resources/covid-if.icns
+cp deploy/release/covid-if.icns __main__.app/Contents/Resources
+
 
 # Replace Resources/lib with a symlink
 rm -rf __main__.app/Contents/Resources/lib
