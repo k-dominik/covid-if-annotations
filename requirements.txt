@@ -1,2 +1,6 @@
-napari_plugin_engine>=0.1.4
+h5py
+magicgui
+napari
+napari-plugin-engine>=0.1.4
 numpy
+pyside2 >=5.12.3

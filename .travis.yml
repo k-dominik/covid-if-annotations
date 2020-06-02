@@ -1,4 +1,4 @@
-language: generic
+language: python
 
 os:
   - linux
@@ -8,6 +8,11 @@ env:
   global:
     - CONDA_ROOT=$HOME/miniconda
     - TEST_ENV=test-env
+
+python:
+  - "3.7"
+
+
 
 cache:
   directories:
@@ -33,12 +38,10 @@ install:
   - conda config --set always_yes yes --set changeps1 no
   - conda update -q conda
   - conda install -c conda-forge conda-build
-
   - conda activate base
-  - conda build -c ilastik-forge -c conda-forge -c defaults conda-recipe
-
+  - conda build --python=${TRAVIS_PYTHON_VERSION} -c ilastik-forge -c conda-forge -c defaults conda-recipe
+  - conda create -n ${TEST_ENV} -c local -c ilastik-forge -c conda-forge -c defaults python=${TRAVIS_PYTHON_VERSION} conda-if-annotations
 
 script:
-  - conda create -n ${TEST_ENV} --use-local -c ilastik-forge -c conda-forge -c defaults conda-if-annotations
   - conda activate ${TEST_ENV}
   - conda-if-annotations -v
