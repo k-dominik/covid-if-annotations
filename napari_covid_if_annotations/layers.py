@@ -26,15 +26,16 @@ def get_centroid_kwargs(centroids, infected_labels):
     label_names = ['unlabeled', 'infected', 'control', 'uncertain']
     labels = [0, 1, 2, 3]
     face_color_cycle = ['white', 'red', 'cyan', 'yellow']
+    edge_color_cycle = ['black', 'black', 'black', 'black']
 
     properties = get_centroid_properties(centroids, infected_labels)
     centroid_kwargs = {
         'name': 'infected-vs-control',
         'properties': properties,
-        'size': 15,
-        'edge_width': 5,
-        'edge_color': 'black',
-        'edge_colormap': 'gray',
+        'size': 8,
+        'edge_width': 2,
+        'edge_color': 'cell_type',
+        'edge_color_cycle': edge_color_cycle,
         'face_color': 'cell_type',
         'face_color_cycle': face_color_cycle,
         'metadata': {'labels': labels,
@@ -58,7 +59,7 @@ def load_labels(f):
     return layers
 
 
-def save_labels(path, layers, is_partial=False):
+def save_labels(layers):
     layer = None
     for this_layer, kwargs, layer_type in layers:
         if layer_type == 'labels':
@@ -72,10 +73,6 @@ def save_labels(path, layers, is_partial=False):
     infected_labels = metadata['infected_labels']
     assert len(seg_ids) == len(infected_labels)
     assert infected_labels[0] == 0
-    # TODO set to if partial if not all cells have been annotated
-    # if any(infected_labels[1:] == 0):
-    #    is_partial = True
-    # TODO warn if we only have partial annotations
 
     infected_labels_columns = ['label_id', 'infected_label']
     infected_labels_table = np.concatenate([seg_ids[:, None], infected_labels[:, None]], axis=1)
@@ -83,8 +80,9 @@ def save_labels(path, layers, is_partial=False):
     # we modify the save path, because we don't want to let the filenaming
     # patterns go out of sync
     save_path = metadata['filename']
-    identifier = '_partial_annotations.h5' if is_partial else '_annotations.h5'
-    save_path = save_path.replace('.h5', identifier)
+    identifier = '_annotations.h5'
+    if identifier not in save_path:
+        save_path = save_path.replace('.h5', identifier)
 
     with h5py.File(save_path, 'a') as f:
         write_image(f, 'cell_segmentation', seg)
