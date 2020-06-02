@@ -1,3 +1,5 @@
+import argparse
+
 import h5py
 import napari
 
